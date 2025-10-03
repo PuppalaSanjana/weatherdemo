@@ -203,22 +203,7 @@ else:
 # ✅ Safe aggregation for monthly averages
 # Make sure we have data to plot
 # --- Monthly Aggregated Visuals ---
-if not df_plot.empty and "DATE" in df_plot.columns:
-    try:
-        agg = (
-            df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
-                   .mean(numeric_only=True)
-                   .reset_index()
-        )
-        agg["DATE"] = agg["DATE"].dt.to_timestamp()
 
-        st.subheader("📊 Monthly Average Weather Trends")
-        st.line_chart(agg.set_index("DATE"))
-
-    except Exception as e:
-        st.error(f"Plot failed: {e}")
-else:
-    st.warning("No DATE column available in dataset.")
 
 
 
