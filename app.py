@@ -206,7 +206,12 @@ if not df.empty:
         df_plot = df.copy()
         try:
             df_plot["DATE"] = pd.to_datetime(df_plot["DATE"], errors="coerce")
-            agg = df_plot.groupby(df_plot["DATE"].dt.to_period("M")).mean().reset_index()
+            agg = (
+                  df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
+                  .agg({"TEMP": "mean", "HUMIDITY": "mean"})  # list only numeric cols you want
+                  .reset_index()
+                )
+
             agg["DATE"] = agg["DATE"].dt.to_timestamp()
             fig, ax = plt.subplots()
             ax.plot(agg["DATE"], agg["TAVG"])
