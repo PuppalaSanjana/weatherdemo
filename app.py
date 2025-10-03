@@ -214,7 +214,7 @@ else:
     st.subheader("📊 Monthly Average Weather Trends")
     st.line_chart(agg.set_index("DATE"))  # plots all numeric cols
 
- except Exception as e:
+except Exception as e:
     st.error(f"Plot failed: {e}")
 else:
     st.warning("DATE column not found in dataset.")
