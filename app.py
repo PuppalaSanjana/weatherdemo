@@ -202,22 +202,26 @@ else:
 # -------------------------
 # ✅ Safe aggregation for monthly averages
 # Make sure we have data to plot
-if 'DATE' in df.columns:
-    df_plot = df.copy()
-    df_plot['DATE'] = pd.to_datetime(df_plot['DATE'], errors='coerce')  # ensure DATE is datetime
-else:
-    df_plot = pd.DataFrame()
-    
-        # Convert Period back to datetime for plotting
-    agg["DATE"] = agg["DATE"].dt.to_timestamp()
+if not df_plot.empty and "DATE" in df_plot.columns:
+    # ✅ safe block for plotting
+    try:
+        # Group by month and take mean of numeric columns
+        agg = (
+            df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
+                   .mean(numeric_only=True)
+                   .reset_index()
+        )
 
-    st.subheader("📊 Monthly Average Weather Trends")
-    st.line_chart(agg.set_index("DATE"))  # plots all numeric cols
+        # Convert Period back to timestamp for plotting
+        agg["DATE"] = agg["DATE"].dt.to_timestamp()
 
-except Exception as e:
-    st.error(f"Plot failed: {e}")
+        st.subheader("📊 Monthly Average Weather Trends")
+        st.line_chart(agg.set_index("DATE"))
+
+    except Exception as e:
+        st.error(f"Plot failed: {e}")
 else:
-    st.warning("DATE column not found in dataset.")
+    st.warning("No DATE column found in dataset.")
 
 
 
