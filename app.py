@@ -200,31 +200,27 @@ else:
 # -------------------------
 # Simple visualization
 # -------------------------
-st.header("Simple Visuals")
-if not df.empty:
-    if "DATE" in df.columns:
-        df_plot = df.copy()
-        try:
-            df_plot["DATE"] = pd.to_datetime(df_plot["DATE"], errors="coerce")
-            agg = (
-                  df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
-                  .agg({"TEMP": "mean", "HUMIDITY": "mean"})  # list only numeric cols you want
-                  .reset_index()
-                )
+# ✅ Safe aggregation for monthly averages
+if "DATE" in df_plot.columns:
+    try:
+        # Group by month and take mean of only numeric columns
+        agg = (
+            df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
+                   .mean(numeric_only=True)
+                   .reset_index()
+        )
 
-            agg["DATE"] = agg["DATE"].dt.to_timestamp()
-            fig, ax = plt.subplots()
-            ax.plot(agg["DATE"], agg["TAVG"])
-            ax.set_title("Monthly average TAVG (from dataset)")
-            ax.set_xlabel("Date")
-            ax.set_ylabel("TAVG")
-            st.pyplot(fig)
-        except Exception as e:
-            st.write("Plot failed:", e)
-    else:
-        st.write("No DATE column to plot.")
+        # Convert Period back to datetime for plotting
+        agg["DATE"] = agg["DATE"].dt.to_timestamp()
+
+        st.subheader("📊 Monthly Average Weather Trends")
+        st.line_chart(agg.set_index("DATE"))  # plots all numeric cols
+
+    except Exception as e:
+        st.error(f"Plot failed: {e}")
 else:
-    st.info("Upload dataset to see visuals.")
+    st.warning("DATE column not found in dataset.")
+
 
 
 
