@@ -201,15 +201,13 @@ else:
 # Simple visualization
 # -------------------------
 # ✅ Safe aggregation for monthly averages
-if "DATE" in df_plot.columns:
-    try:
-        # Group by month and take mean of only numeric columns
-        agg = (
-            df_plot.groupby(df_plot["DATE"].dt.to_period("M"))
-                   .mean(numeric_only=True)
-                   .reset_index()
-        )
-
+# Make sure we have data to plot
+if 'DATE' in df.columns:
+    df_plot = df.copy()
+    df_plot['DATE'] = pd.to_datetime(df_plot['DATE'], errors='coerce')  # ensure DATE is datetime
+else:
+    df_plot = pd.DataFrame()
+    
         # Convert Period back to datetime for plotting
         agg["DATE"] = agg["DATE"].dt.to_timestamp()
 
